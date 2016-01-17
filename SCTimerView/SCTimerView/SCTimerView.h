@@ -9,6 +9,11 @@
 #import <UIKit/UIKit.h>
 @class SCTimerView;
 
+typedef NS_ENUM(NSInteger, SCTimerViewStyle) {
+    SCTimerViewStyleDefault,       // regular timer view
+    SCTimerViewStyleValue1         // preferences style timer view
+};
+
 @protocol SCTimerViewDelegate <NSObject>
 @optional
 - (void)timerView:(SCTimerView *)timerView didUpdateTimeInterval:(NSTimeInterval)timeInterval;
@@ -17,6 +22,11 @@
 
 @interface SCTimerView : UIView
 
+- (instancetype)initWithStyle:(SCTimerViewStyle)style; // must specify style at creation. -init: calls this with SCTimerViewStyleDefault
+- (instancetype)initWithFrame:(CGRect)frame style:(SCTimerViewStyle)style NS_DESIGNATED_INITIALIZER; // must specify style at creation. -initWithFrame: calls this with SCTimerViewStyleDefault
+- (instancetype)initWithCoder:(NSCoder *)aDecoder NS_DESIGNATED_INITIALIZER;
+
+@property (nonatomic, readonly) SCTimerViewStyle style;
 @property (nonatomic, weak) id<SCTimerViewDelegate> delegate;
 @property (nonatomic, assign) NSTimeInterval timeInterval;
 

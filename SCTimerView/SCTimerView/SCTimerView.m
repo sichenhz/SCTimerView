@@ -26,44 +26,101 @@
 
 @interface SCTimerView()
 
+@property (nonatomic, strong) NSTimer *timer;
+
+// SCTimerViewStyleDefault
+@property (nonatomic, strong) UILabel *timerLabel;
+
+// SCTimerViewStyleValue1
 @property (nonatomic, strong) UIButton *hourTensButton;
 @property (nonatomic, strong) UIButton *hourOnesButton;
 @property (nonatomic, strong) UIButton *minuteTensButton;
 @property (nonatomic, strong) UIButton *minuteOnesButton;
 @property (nonatomic, strong) UIButton *secondTensButton;
 @property (nonatomic, strong) UIButton *secondOnesButton;
-
-@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) UILabel *leftColonLabel;
+@property (nonatomic, strong) UILabel *rightColonLabel;
 
 @end
 
 @implementation SCTimerView
 
+#pragma mark - <Life Cycle>
+
+- (instancetype)initWithStyle:(SCTimerViewStyle)style {
+    return [self initWithFrame:CGRectZero style:style];
+}
+
 - (instancetype)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:CGRectMake(frame.origin.x, frame.origin.y, 111, 21)]) {
-        _hourTensButton = [self createTimerLabel];
-        _hourOnesButton = [self createTimerLabel];
-        _minuteTensButton = [self createTimerLabel];
-        _minuteOnesButton = [self createTimerLabel];
-        _secondTensButton = [self createTimerLabel];
-        _secondOnesButton = [self createTimerLabel];
-        UILabel *leftColonLabel = [self createColonLabel];
-        UILabel *rightColonLabel = [self createColonLabel];
-        
-        CGFloat margin = 3;
-        _hourTensButton.x = 0;
-        _hourOnesButton.x = CGRectGetMaxX(_hourTensButton.frame) + margin;
-        leftColonLabel.x = CGRectGetMaxX(_hourOnesButton.frame);
-        _minuteTensButton.x = CGRectGetMaxX(leftColonLabel.frame);
-        _minuteOnesButton.x = CGRectGetMaxX(_minuteTensButton.frame) + margin;
-        rightColonLabel.x = CGRectGetMaxX(_minuteOnesButton.frame);
-        _secondTensButton.x = CGRectGetMaxX(rightColonLabel.frame);
-        _secondOnesButton.x = CGRectGetMaxX(_secondTensButton.frame) + margin;
+    return [self initWithFrame:frame style:SCTimerViewStyleDefault];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame style:(SCTimerViewStyle)style {
+    if (self = [super initWithFrame:frame]) {
+        [self setUpStyle:style];
     }
     return self;
 }
 
-- (UIButton *)createTimerLabel {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super initWithCoder:aDecoder]) {
+        [self setUpStyle:SCTimerViewStyleDefault];
+    }
+    return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    switch (self.style) {
+        case SCTimerViewStyleDefault:
+            self.timerLabel.frame = self.bounds;
+            break;
+        case SCTimerViewStyleValue1:
+        {
+            CGFloat margin = 3;
+            self.hourTensButton.x = 0;
+            self.hourOnesButton.x = CGRectGetMaxX(self.hourTensButton.frame) + margin;
+            self.leftColonLabel.x = CGRectGetMaxX(self.hourOnesButton.frame);
+            self.minuteTensButton.x = CGRectGetMaxX(self.leftColonLabel.frame);
+            self.minuteOnesButton.x = CGRectGetMaxX(self.minuteTensButton.frame) + margin;
+            self.rightColonLabel.x = CGRectGetMaxX(self.minuteOnesButton.frame);
+            self.secondTensButton.x = CGRectGetMaxX(self.rightColonLabel.frame);
+            self.secondOnesButton.x = CGRectGetMaxX(self.secondTensButton.frame) + margin;
+        }
+            break;
+    }
+}
+
+#pragma mark - <Private Method>
+
+- (void)setUpStyle:(SCTimerViewStyle)style {
+    _style = style;
+    switch (_style) {
+        case SCTimerViewStyleDefault:
+            self.timerLabel = [self createTimerLabel];
+            break;
+        case SCTimerViewStyleValue1:
+            self.hourTensButton = [self createItemLabel];
+            self.hourOnesButton = [self createItemLabel];
+            self.minuteTensButton = [self createItemLabel];
+            self.minuteOnesButton = [self createItemLabel];
+            self.secondTensButton = [self createItemLabel];
+            self.secondOnesButton = [self createItemLabel];
+            self.leftColonLabel = [self createColonLabel];
+            self.rightColonLabel = [self createColonLabel];
+            break;
+    }
+}
+
+- (UILabel *)createTimerLabel {
+    UILabel *label = [[UILabel alloc] init];
+    label.text = @"";
+    label.font = [UIFont systemFontOfSize:14];
+    [self addSubview:label];
+    return label;
+}
+
+- (UIButton *)createItemLabel {
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 15, 21)];
     button.userInteractionEnabled = NO;
     [button setTitle:@"" forState:UIControlStateNormal];
@@ -98,6 +155,53 @@
     [timerThread start];
 }
 
+- (void)updateTime {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.timeInterval >= 0) {
+            NSInteger second = (NSInteger)self.timeInterval % 60;
+            NSInteger minute = ((NSInteger)self.timeInterval / 60) % 60;
+            NSInteger hour = ((NSInteger)self.timeInterval / 3600) % 24;
+            NSInteger day = self.timeInterval / 86400;
+            switch (_style) {
+                case SCTimerViewStyleDefault:
+                {
+                    NSString *title = @"付尾款剩余时间：";
+                    if (day) {
+                        self.timerLabel.text = [NSString stringWithFormat:@"%@%zd天%zd时%zd分%zd秒", title, day, hour % 24, minute % 60, second % 60];
+                    } else if (hour) {
+                        self.timerLabel.text = [NSString stringWithFormat:@"%@%zd时%zd分%zd秒", title, hour % 24, minute % 60, second % 60];
+                    } else if (minute) {
+                        self.timerLabel.text = [NSString stringWithFormat:@"%@%zd分%zd秒", title, minute % 60, second % 60];
+                    } else if (second) {
+                        self.timerLabel.text = [NSString stringWithFormat:@"%@%zd秒", title, second % 60];
+                    } else {
+                        self.timerLabel.text = [NSString stringWithFormat:@"付尾款时间已结束"];
+                    }
+                }
+                    break;
+                case SCTimerViewStyleValue1:
+                {
+                    [self.secondOnesButton setTitle:[NSString stringWithFormat:@"%zd", second % 10] forState:UIControlStateNormal];
+                    [self.secondTensButton setTitle:[NSString stringWithFormat:@"%zd", second / 10] forState:UIControlStateNormal];
+                    [self.minuteOnesButton setTitle:[NSString stringWithFormat:@"%zd", minute % 10] forState:UIControlStateNormal];
+                    [self.minuteTensButton setTitle:[NSString stringWithFormat:@"%zd", minute / 10] forState:UIControlStateNormal];
+                    [self.hourOnesButton setTitle:[NSString stringWithFormat:@"%zd", hour % 10] forState:UIControlStateNormal];
+                    [self.hourTensButton setTitle:[NSString stringWithFormat:@"%zd", hour / 10] forState:UIControlStateNormal];
+                }
+                    break;
+            }
+            if ([self.delegate respondsToSelector:@selector(timerView:didUpdateTimeInterval:)]) {
+                [self.delegate timerView:self didUpdateTimeInterval:self.timeInterval];
+            }
+            self.timeInterval--;
+        } else {
+            [self stopTimer];
+        }
+    });
+}
+
+#pragma mark - <Public Method>
+
 - (void)stopTimer {
     if (self.timer) {
         [self.timer invalidate];
@@ -109,28 +213,6 @@
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
     [runLoop run];
-}
-
-- (void)updateTime {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.timeInterval >= 0) {
-            NSInteger second = (NSInteger)self.timeInterval % 60;
-            [self.secondOnesButton setTitle:[NSString stringWithFormat:@"%zd", second % 10] forState:UIControlStateNormal];
-            [self.secondTensButton setTitle:[NSString stringWithFormat:@"%zd", second / 10] forState:UIControlStateNormal];
-            NSInteger minute = ((NSInteger)self.timeInterval / 60) % 60;
-            [self.minuteOnesButton setTitle:[NSString stringWithFormat:@"%zd", minute % 10] forState:UIControlStateNormal];
-            [self.minuteTensButton setTitle:[NSString stringWithFormat:@"%zd", minute / 10] forState:UIControlStateNormal];
-            NSInteger hour = self.timeInterval / 3600;
-            [self.hourOnesButton setTitle:[NSString stringWithFormat:@"%zd", hour % 10] forState:UIControlStateNormal];
-            [self.hourTensButton setTitle:[NSString stringWithFormat:@"%zd", hour / 10] forState:UIControlStateNormal];
-            if ([self.delegate respondsToSelector:@selector(timerView:didUpdateTimeInterval:)]) {
-                [self.delegate timerView:self didUpdateTimeInterval:self.timeInterval];
-            }
-            self.timeInterval--;
-        } else {
-            [self stopTimer];
-        }
-    });
 }
 
 @end
