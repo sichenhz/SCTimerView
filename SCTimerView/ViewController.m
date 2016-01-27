@@ -12,6 +12,7 @@
 @interface ViewController ()<SCTimerViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *contentView;
+@property (weak, nonatomic) IBOutlet SCTimerView *timerView;
 
 @end
 
@@ -20,15 +21,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+    [self configureTimerView];
     [self createTimerView1];
     [self createTimerView2];
 }
 
+- (void)configureTimerView {
+    self.timerView.delegate = self;
+    self.timerView.timeInterval = 72000;
+    [self.timerView startTimer];
+}
+
 - (void)createTimerView1 {
-    SCTimerView *timerView = [[SCTimerView alloc] initWithFrame:CGRectMake(50, 250, 210, 21) style:SCTimerViewStyleDefault];
+    SCTimerView *timerView = [[SCTimerView alloc] initWithFrame:CGRectMake(50, 250, 220, 21) style:SCTimerViewStyleDefault];
     timerView.delegate = self;
-    timerView.timeInterval = 7200;
+    timerView.timeInterval = 720000;
     [timerView startTimer];
     [self.contentView addSubview:timerView];
 }

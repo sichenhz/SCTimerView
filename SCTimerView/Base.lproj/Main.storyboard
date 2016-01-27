@@ -23,7 +23,25 @@
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ygy-LJ-60A" userLabel="contentView">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="900"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NdY-WU-3z0" customClass="SCTimerView">
+                                                <rect key="frame" x="50" y="215" width="111" height="21"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="111" id="1sF-BI-b97"/>
+                                                    <constraint firstAttribute="height" constant="21" id="dMc-Nh-CoQ"/>
+                                                </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="style">
+                                                        <integer key="value" value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </view>
+                                        </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstItem="NdY-WU-3z0" firstAttribute="leading" secondItem="ygy-LJ-60A" secondAttribute="leading" constant="50" id="EVD-6R-KBu"/>
+                                            <constraint firstItem="NdY-WU-3z0" firstAttribute="centerY" secondItem="ygy-LJ-60A" secondAttribute="centerY" multiplier="0.5" id="G3l-8z-4gG"/>
+                                        </constraints>
                                     </view>
                                 </subviews>
                                 <constraints>
@@ -46,6 +64,7 @@
                     </view>
                     <connections>
                         <outlet property="contentView" destination="ygy-LJ-60A" id="dFs-yq-DZj"/>
+                        <outlet property="timerView" destination="NdY-WU-3z0" id="glX-yS-Boi"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

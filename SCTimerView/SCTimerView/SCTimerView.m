@@ -64,7 +64,6 @@
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     if (self = [super initWithCoder:aDecoder]) {
-        [self setUpStyle:SCTimerViewStyleDefault];
     }
     return self;
 }
@@ -110,6 +109,10 @@
             self.rightColonLabel = [self createColonLabel];
             break;
     }
+}
+
+- (void)setStyle:(SCTimerViewStyle)style {
+    [self setUpStyle:style];
 }
 
 - (UILabel *)createTimerLabel {

@@ -26,7 +26,12 @@ typedef NS_ENUM(NSInteger, SCTimerViewStyle) {
 - (instancetype)initWithFrame:(CGRect)frame style:(SCTimerViewStyle)style NS_DESIGNATED_INITIALIZER; // must specify style at creation. -initWithFrame: calls this with SCTimerViewStyleDefault
 - (instancetype)initWithCoder:(NSCoder *)aDecoder NS_DESIGNATED_INITIALIZER;
 
-@property (nonatomic, readonly) SCTimerViewStyle style;
+#if TARGET_INTERFACE_BUILDER
+@property (nonatomic, assign) IBInspectable NSInteger style;
+#else
+@property (nonatomic, assign, readonly) SCTimerViewStyle style;
+#endif
+
 @property (nonatomic, weak) id<SCTimerViewDelegate> delegate;
 @property (nonatomic, assign) NSTimeInterval timeInterval;
 
