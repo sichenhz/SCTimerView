@@ -145,19 +145,6 @@
     return label;
 }
 
-- (void)startTimer {
-    if (self.timeInterval <= 0){
-        return;
-    }
-    if (self.timer) {
-        [self.timer invalidate];
-        self.timer = nil;
-    }
-    [self updateTime];
-    NSThread *timerThread = [[NSThread alloc] initWithTarget:self selector:@selector(timerStart) object:nil];
-    [timerThread start];
-}
-
 - (void)updateTime {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.timeInterval >= 0) {
@@ -205,17 +192,25 @@
 
 #pragma mark - <Public Method>
 
+- (void)startTimer {
+    if (self.timeInterval <= 0){
+        return;
+    }
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    [self updateTime];
+    
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+}
+
 - (void)stopTimer {
     if (self.timer) {
         [self.timer invalidate];
         self.timer = nil;
     }
-}
-
-- (void)timerStart {
-    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTime) userInfo:nil repeats:YES];
-    [runLoop run];
 }
 
 @end
