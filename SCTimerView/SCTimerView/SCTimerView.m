@@ -57,7 +57,7 @@
 
 - (instancetype)initWithFrame:(CGRect)frame style:(SCTimerViewStyle)style {
     if (self = [super initWithFrame:frame]) {
-        [self setUpStyle:style];
+        [self setStyle:style];
     }
     return self;
 }
@@ -70,6 +70,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
     switch (self.style) {
         case SCTimerViewStyleDefault:
             self.timerLabel.frame = self.bounds;
@@ -92,7 +93,7 @@
 
 #pragma mark - <Private Method>
 
-- (void)setUpStyle:(SCTimerViewStyle)style {
+- (void)setStyle:(SCTimerViewStyle)style {
     _style = style;
     switch (_style) {
         case SCTimerViewStyleDefault:
@@ -109,10 +110,6 @@
             self.rightColonLabel = [self createColonLabel];
             break;
     }
-}
-
-- (void)setStyle:(SCTimerViewStyle)style {
-    [self setUpStyle:style];
 }
 
 - (UILabel *)createTimerLabel {
